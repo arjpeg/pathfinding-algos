@@ -1,0 +1,1 @@
+export const END_CELL = 2, PATH_CELL = 1, START_CELL = 0;

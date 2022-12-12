@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Path Finding Algorithms Visualized</title>
+
+    <link rel="stylesheet" href="./css/styles.css">
+    <script src="./js/main.js" type="module" defer></script>
+</head>
+
+<body>
+    <nav>
+        <h1>Path Finding Algorithms Visualized</h1>
+
+        <div id="play-options">
+            <button id="play" class="play-option-btn">
+                <p>Play</p>
+            </button>
+
+            <div id="pause-reset">
+                <button id="pause" class="play-option-btn">
+                    <p>Pause</p>
+                </button>
+                <button id="clear" class="play-option-btn">
+                    <p>Clear</p>
+                </button>
+            </div>
+        </div>
+
+        <div id="options">
+            <h2>Options</h2>
+
+            <div class="option-group">
+                <div class="dropdown">
+                    <button id="algorithms" class="dropdown-btn">Algorithms</button>
+                    <div class="dropdown-content">
+                        <p>Breadth First Search</p>
+                        <p>A*</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="option-group">
+                <div class="dropdown">
+                    <button id="algorithms" class="dropdown-btn">Cell Type</button>
+
+                    <div class="dropdown-content">
+                        <button onclick="changeCurrentCellType('start', 'Start Cell')">Start Cell</button>
+                        <button onclick="changeCurrentCellType('path', 'Path Cell')">Path Cell</button>
+                        <button onclick="changeCurrentCellType('end', 'End Cell')">End Cell</button>
+                    </div>
+                </div>
+                <p id="current-cell-type" class="option-group-info">Path Cell</p>
+            </div>
+
+
+            <br>
+            <h3>Grid Size</h3>
+            <input oninput="newGrid(this.value)" type="range" min="10" max="100" value="50" class="slider"
+                id="gridSize">
+
+        </div>
+    </nav>
+
+    <main>
+        <!-- Shell for main.js to target -->
+        <div id="mainGrid"></div>
+    </main>
+</body>
+
+</html>
