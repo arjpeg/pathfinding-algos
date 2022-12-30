@@ -31,7 +31,10 @@ export function createHTMLRow(row, rowIdx) {
         cellElem.classList.add("cell");
         rowElem.appendChild(cellElem);
 
-        if (cellElem.getBoundingClientRect().right > window.innerWidth) break;
+        if (cellElem.getBoundingClientRect().right > window.innerWidth) {
+            log(rowElem);
+            break;
+        };
     }
 
     return rowElem;
@@ -66,4 +69,10 @@ export function updateCellText(row, col, text) {
     const cell = gridElem.children.item(row).children.item(col);
 
     cell.innerHTML = text;
+}
+
+export function changeCellColor(row, col, color, alpha = 0.45) {
+    const cell = gridElem.children.item(row).children.item(col);
+
+    cell.style.backgroundColor = color.split(')')[0] + `, ${alpha})`;
 }

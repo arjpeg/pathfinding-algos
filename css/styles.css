@@ -1,5 +1,6 @@
 @import url("navbar.css");
 @import url("grid.css");
+@import url("cell.css");
 
 html,
 body {
@@ -19,7 +20,7 @@ body {
 
 
 nav {
-    flex: 0.2;
+    width: 17.5%;
 }
 
 main {

@@ -1,5 +1,6 @@
 import { CELL_EMPTY, CELL_END, CELL_FILLED, CELL_START } from "../CellState.js";
-import { updateCellText } from "../HtmlUtil.js";
+import { changeCellColor as updateCellColor, updateCellText } from "../HtmlUtil.js";
+import { from as _from } from "../main.js";
 import Position from "./Pos.js";
 
 export default class BFS {
@@ -22,6 +23,8 @@ export default class BFS {
                 if (cell === CELL_FILLED) return { value: NaN, from: null };
             });
         });
+
+        this.foundSolution = false;
     }
 
     /**
@@ -32,24 +35,26 @@ export default class BFS {
      * @param {Position} position
      */
     getNeighbors(position) {
-        let neighbors = [];
+        const isValidPos = (pos) => {
+            if (pos.row < 0 || pos.row >= this.grid.length) return false;
+            if (pos.col < 0 || pos.col >= this.grid[0].length) return false;
 
-        for (let i = -1; i <= 1; i++) {
-            for (let j = -1; j <= 1; j++) {
-                const newPos = { row: position.row + i, col: position.col + j };
+            return true;
+        };
 
-                if (i === 0 && j === 0) continue;
-                if (newPos.row < 0 || newPos.row >= this.grid.length) continue;
-                if (newPos.col < 0 || newPos.col >= this.grid[0].length) continue;
+        let neighbors = [
+            { row: position.row - 1, col: position.col },
+            { row: position.row + 1, col: position.col },
+            { row: position.row, col: position.col - 1 },
+            { row: position.row, col: position.col + 1 },
+        ];
 
-                neighbors.push({
-                    pos: newPos,
-                    value: this.knownDists[newPos.row][newPos.col].value
-                });
-            }
-        }
+        neighbors = neighbors.filter(isValidPos);
 
-        return neighbors;
+        return neighbors.map((cell) => {
+            return { pos: cell, value: this.knownDists[cell.row][cell.col].value };
+        });
+
     }
 
     /**
@@ -63,7 +68,9 @@ export default class BFS {
                 const curCell = this.knownDists[i][j].value;
                 let curCellValue = curCell;
 
-                if (isNaN(curCell) || curCell == 0 || (i === this.endPos.row && j === this.endPos.col)) continue;
+                if (isNaN(curCell) || curCell == 0) continue;
+                if (this.endPos && (i === this.endPos.row && j === this.endPos.col)) continue;
+
                 if (curCell === -1) curCellValue = 0;
 
                 let neighbors = this.getNeighbors({ row: i, col: j });
@@ -93,36 +100,57 @@ export default class BFS {
                         newFrom = { row: i, col: j };
                     }
 
-                    if (row === this.endPos.row && col === this.endPos.col) newFrom = { row: i, col: j };
+                    if (this.endPos)
+                        if (row === this.endPos.row && col === this.endPos.col) newFrom = { row: i, col: j };
 
                     toUpdate.push({ row, col, value: newNeighborValue, from: newFrom });
                 });
             }
         }
 
+        toUpdate.forEach((cell) => {
+            let { value } = cell;
+            if (value == -1 || value == -2) return;
+
+            const colors = [
+                'rgb(219, 95, 81)',
+                'rgb(227, 118, 64)',
+                'rgb(255, 242, 0)',
+                'rgb(54, 168, 90)',
+                'rgb(15, 160, 209)',
+                'rgb(148, 15, 209)'
+            ];
+
+            value = value % colors.length;
+            updateCellColor(cell.row, cell.col, colors[value]);
+        });
+
+
         toUpdate.forEach((cellToUpdate) => {
             const { row, col, value, from } = cellToUpdate;
 
             this.knownDists[row][col] = { value, from };
+            updateCellText(row, col, value);
 
-            // console.log(from);
 
-            if (row === this.endPos.row && col === this.endPos.col) {
-                console.log("FOUND SOLUTION!", row, col);
-                // this.printPath({ row, col });
-                console.log(from);
-                let curPathStr = "";
-                let curCell = { row, col, from: cellToUpdate.from };
+            if (!this.endPos) return;
 
-                while (curCell.from) {
-                    curPathStr += `-> (${row}, ${col})`;
-                    curCell = curCell.from;
+            if (row === this.endPos.row && col === this.endPos.col && !this.foundSolution) {
+                console.log("FOUND SOLUTION!", row, col, _from(row, col));
+                let path = [{ row, col }];
+                let curCell = { row, col };
+
+                while (curCell = _from(curCell.row, curCell.col)) {
+                    path.push(curCell);
                 }
 
-                console.log(curPathStr);
-            }
+                let i = 0;
+                for (const cell of path.reverse()) {
+                    setTimeout(() => updateCellColor(cell.row, cell.col, "rgb(255, 0, 0)", 0.65), i++ * 100);
+                }
 
-            updateCellText(row, col, value);
+                this.foundSolution = true;
+            }
         });
     }
 }

@@ -1,0 +1,52 @@
+@keyframes scaleUpAndDown {
+    from {}
+
+    to {
+        background-color: #104055;
+    }
+}
+
+
+.cell {
+    flex: 1;
+    aspect-ratio: 1 / 1;
+    min-width: 20px;
+
+    border: 1px #0c3547 solid;
+    background-color: white;
+
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 100%;
+    line-height: 100%;
+
+    transition: background-color 0.5s;
+}
+
+.cell:hover {
+    animation: scaleUpAndDown 150ms ease-out 0ms forwards;
+}
+
+.cell[data-cell="filled"] {
+    background-color: #0c3547;
+}
+
+.cell[data-cell="empty"] {
+    background-color: white;
+}
+
+.cell[data-cell="start"] {
+    background-color: rgb(43, 178, 88);
+}
+
+.cell[data-cell="end"] {
+    background-color: #e44d26;
+}

@@ -99,6 +99,12 @@ export function changeCurrentCellType(newType, displayText) {
     document.getElementById("current-cell-type").innerText = displayText;
 }
 
+export function from(r, c) {
+    if (Number.isInteger(r))
+        return currentAlgorithm.knownDists[r][c].from;
+    else
+        return currentAlgorithm.knownDists[r.row][r.col].from;
+};
 
 playOptionBtns.play.addEventListener('click', (e) => {
     currentAlgorithm = new BFS(grid, startCell, endCell);
@@ -169,6 +175,7 @@ window.step = () => {
 
 window.grid = grid;
 window.curAlgo = () => currentAlgorithm;
-window.from = (r, c) => currentAlgorithm.knownDists[r][c].from;
+window.from = from;
+window.grid = () => grid;
 
 newGrid();
