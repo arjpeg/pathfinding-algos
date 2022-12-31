@@ -166,7 +166,7 @@ window.addEventListener("keypress", (e) => {
 window.changeCurrentCellType = changeCurrentCellType;
 window.newGrid = newGrid;
 window.step = () => {
-    if (currentAlgorithm) currentAlgorithm.step();
+    if (currentAlgorithm && !currentAlgorithm.foundSolution) currentAlgorithm.step();
     else {
         currentAlgorithm = new BFS(grid, startCell, endCell);
         currentAlgorithm.step();

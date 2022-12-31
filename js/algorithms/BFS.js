@@ -1,5 +1,5 @@
 import { CELL_EMPTY, CELL_END, CELL_FILLED, CELL_START } from "../CellState.js";
-import { changeCellColor as updateCellColor, updateCellText } from "../HtmlUtil.js";
+import { changeCellColor as updateCellColor } from "../HtmlUtil.js";
 import { from as _from } from "../main.js";
 import Position from "./Pos.js";
 
@@ -25,6 +25,7 @@ export default class BFS {
         });
 
         this.foundSolution = false;
+        this.frontier = [startPos];
     }
 
     /**
@@ -63,49 +64,43 @@ export default class BFS {
     step() {
         let toUpdate = [];
 
-        for (let i = 0; i < this.grid.length; i++) {
-            for (let j = 0; j < this.grid[i].length; j++) {
-                const curCell = this.knownDists[i][j].value;
-                let curCellValue = curCell;
+        for (const cellInFrontier of this.frontier) {
+            const curCell = this.knownDists[cellInFrontier.row][cellInFrontier.col].value;
+            let curCellValue = curCell != -1 ? curCell : 0;
 
-                if (isNaN(curCell) || curCell == 0) continue;
-                if (this.endPos && (i === this.endPos.row && j === this.endPos.col)) continue;
+            if (isNaN(curCell) || curCell == 0) continue;
 
-                if (curCell === -1) curCellValue = 0;
+            let neighbors = this.getNeighbors(cellInFrontier);
+            /* Loop through the neighbors updating their distance to be 
+            the minimum of this cell's dist+1, and its current distance
+            except for the case where 
+                1. the neighbor is START_CELL
+                2. the neighbor's value is 0 (just count that as INF)
+            */
 
-                let neighbors = this.getNeighbors({ row: i, col: j });
+            neighbors.forEach((cell) => {
+                const { row, col } = cell.pos;
+                const neighborValue = cell.value;
 
-                /* Loop through the neighbors updating their distance to be 
-                the minimum of this cell's dist+1, and its current distance
-                except for the case where 
-                    1. the neighbor is START_CELL
-                    2. the neighbor's value is 0 (just count that as INF)
-                */
+                if (isNaN(neighborValue)) return;
 
-                neighbors.forEach((cell) => {
-                    const { row, col } = cell.pos;
-                    const neighborValue = cell.value;
+                let newFrom = this.knownDists[row][col].from;
+                let newNeighborValue = neighborValue;
 
-                    if (isNaN(neighborValue)) return;
+                if (newNeighborValue === CELL_START) { };
+                if (neighborValue === 0) {
+                    newFrom = cellInFrontier;
+                    newNeighborValue = curCellValue + 1;
+                } else if (curCellValue + 1 < neighborValue) {
+                    newNeighborValue = curCellValue + 1;
+                    newFrom = cellInFrontier;
+                }
 
-                    let newFrom = this.knownDists[row][col].from;
-                    let newNeighborValue = neighborValue;
+                if (this.endPos)
+                    if (row === this.endPos.row && col === this.endPos.col) newFrom = cellInFrontier;
 
-                    if (newNeighborValue === CELL_START) { };
-                    if (neighborValue === 0) {
-                        newFrom = { row: i, col: j };
-                        newNeighborValue = curCellValue + 1;
-                    } else if (curCellValue + 1 < neighborValue) {
-                        newNeighborValue = curCellValue + 1;
-                        newFrom = { row: i, col: j };
-                    }
-
-                    if (this.endPos)
-                        if (row === this.endPos.row && col === this.endPos.col) newFrom = { row: i, col: j };
-
-                    toUpdate.push({ row, col, value: newNeighborValue, from: newFrom });
-                });
-            }
+                toUpdate.push({ row, col, value: newNeighborValue, from: newFrom });
+            });
         }
 
         toUpdate.forEach((cell) => {
@@ -122,7 +117,7 @@ export default class BFS {
             ];
 
             value = value % colors.length;
-            updateCellColor(cell.row, cell.col, colors[value]);
+            updateCellColor(cell.row, cell.col, colors[value], 0.2);
         });
 
 
@@ -130,8 +125,6 @@ export default class BFS {
             const { row, col, value, from } = cellToUpdate;
 
             this.knownDists[row][col] = { value, from };
-            updateCellText(row, col, value);
-
 
             if (!this.endPos) return;
 
@@ -152,5 +145,18 @@ export default class BFS {
                 this.foundSolution = true;
             }
         });
+
+        // keeps track of the unique positions that we change
+        let seen = [];
+
+        toUpdate.forEach((cell) => {
+            for (let _cell of seen) {
+                if (_cell.row == cell.row && _cell.col == cell.col) return;
+            }
+
+            seen.push(cell);
+        });
+
+        this.frontier = seen;
     }
 }
