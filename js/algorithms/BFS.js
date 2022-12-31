@@ -108,12 +108,10 @@ export default class BFS {
             if (value == -1 || value == -2) return;
 
             const colors = [
-                'rgb(219, 95, 81)',
-                'rgb(227, 118, 64)',
-                'rgb(255, 242, 0)',
-                'rgb(54, 168, 90)',
-                'rgb(15, 160, 209)',
-                'rgb(148, 15, 209)'
+                'rgb(8, 82, 199)',
+                'rgb(66, 135, 245)',
+                'rgb(77, 135, 227)',
+                'rgb(108, 155, 230)'
             ];
 
             value = value % colors.length;
@@ -130,6 +128,8 @@ export default class BFS {
 
             if (row === this.endPos.row && col === this.endPos.col && !this.foundSolution) {
                 console.log("FOUND SOLUTION!", row, col, _from(row, col));
+                this.foundSolution = true;
+
                 let path = [{ row, col }];
                 let curCell = { row, col };
 
@@ -139,10 +139,8 @@ export default class BFS {
 
                 let i = 0;
                 for (const cell of path.reverse()) {
-                    setTimeout(() => updateCellColor(cell.row, cell.col, "rgb(255, 0, 0)", 0.65), i++ * 100);
+                    setTimeout(() => updateCellColor(cell.row, cell.col, "rgb(253, 0, 0)", 0.55), i++ * 100);
                 }
-
-                this.foundSolution = true;
             }
         });
 

@@ -14,7 +14,7 @@ let prevCellHovered;
 let currentAlgorithm;
 let stepTimeoutID;
 
-const FRAME_RATE_MS = 1000;
+const FRAME_RATE_MS = 100;
 
 const playOptionBtns = {
     play: document.querySelector('#play'),
@@ -63,7 +63,7 @@ export function handleCellClickEvent(row, col) {
  * @param {number} gridSize
  * @returns {number[][]}
  */
-export function newGrid(gridSize = 10) {
+export function newGrid(gridSize = document.getElementById("gridSize").value) {
     clearHTMLGrid();
     currentAlgorithm = null;
 
@@ -107,9 +107,9 @@ export function from(r, c) {
 };
 
 playOptionBtns.play.addEventListener('click', (e) => {
-    currentAlgorithm = new BFS(grid, startCell, endCell);
-    currentAlgorithm.step();
-    // stepTimeoutID = setInterval(currentAlgorithm.step, FRAME_RATE_MS);
+    // currentAlgorithm = new BFS(grid, startCell, endCell);
+    // currentAlgorithm.step();
+    stepTimeoutID = setInterval(step, FRAME_RATE_MS);
 });
 
 playOptionBtns.clear.addEventListener('click', (e) => {
@@ -155,18 +155,17 @@ window.addEventListener("keypress", (e) => {
     if (e.key === "p") changeCurrentCellType('path', 'Path Cell');
     if (e.key === "e") changeCurrentCellType('end', 'End Cell');
     if (e.key === " ") {
-        if (currentAlgorithm) currentAlgorithm.step();
-        else {
-            currentAlgorithm = new BFS(grid, startCell, endCell);
-            currentAlgorithm.step();
-        }
+        step();
     }
 });
 
 window.changeCurrentCellType = changeCurrentCellType;
 window.newGrid = newGrid;
 window.step = () => {
-    if (currentAlgorithm && !currentAlgorithm.foundSolution) currentAlgorithm.step();
+    if (currentAlgorithm) {
+        if (currentAlgorithm.foundSolution) { currentAlgorithm = null; clearInterval(stepTimeoutID); }
+        else { currentAlgorithm.step(); }
+    }
     else {
         currentAlgorithm = new BFS(grid, startCell, endCell);
         currentAlgorithm.step();
