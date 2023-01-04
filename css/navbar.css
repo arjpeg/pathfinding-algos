@@ -111,7 +111,9 @@ nav h1 {
     margin: 0;
 
     border: none;
-    background-color: none;
+    background: none;
+    outline: none;
+    cursor: pointer;
 }
 
 .dropdown-btn {
